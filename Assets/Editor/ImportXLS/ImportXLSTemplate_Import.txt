@@ -1,0 +1,102 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using NPOI.SS.UserModel;
+using NPOI.HSSF.UserModel;
+using NPOI.XSSF.UserModel;
+using UnityEditor;
+using UnityEngine;
+
+public class $$SHEET_NAME$$_Import : AssetPostprocessor
+{
+    static readonly string sheetName  = "$$SHEET_NAME$$";
+    static readonly string excellPath = "$$EXCELL_PATH$$";
+    static readonly string exportPath = "$$EXPORT_PATH$$";
+
+    static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+    {
+        foreach (string asset in importedAssets)
+        {
+            if (Path.GetFileName(excellPath).ToLower() != Path.GetFileName(asset).ToLower())
+            {
+                continue;
+            }
+
+            using (FileStream stream = File.Open(asset, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                IWorkbook book = null;
+                if (Path.GetExtension (asset) == ".xls")
+                {
+                    book = new HSSFWorkbook(stream);
+                }
+                else
+                {
+                    book = new XSSFWorkbook(stream);
+                }
+
+                ImportXLS.CompleteDirectory(Path.GetDirectoryName(exportPath));
+
+                var data = ($$TABLE_NAME$$)AssetDatabase.LoadAssetAtPath(exportPath, typeof($$TABLE_NAME$$));
+                if (data == null)
+                {
+                    data = ScriptableObject.CreateInstance<$$TABLE_NAME$$>();
+                    AssetDatabase.CreateAsset((ScriptableObject)data, exportPath);
+                }
+                data.hideFlags = HideFlags.NotEditable;
+                data.Rows.Clear();
+
+                // check sheet
+                var sheet = book.GetSheet(sheetName);
+                if (sheet == null)
+                {
+                    Debug.LogError($"sheet is not found. '{sheetName}'");
+                    continue;
+                }
+
+                var posList = new Dictionary<string, ImportXLS.PosIndex>();
+                string[,] grid = ImportXLS.GetGrid(sheet, posList);
+                ImportXLS.PosIndex id = posList[ImportXLS.TRIGGER_ID];
+
+                ImportXLS.GetGameAssembly();
+
+                for (int r = id.R + 2; r < grid.GetUpperBound(0)+1; r++)
+                {
+                    var row = new $$TABLE_NAME$$.Row();
+                    int c = id.C;
+
+                    string cell = grid[r, c];
+
+                    // End of line
+                    if (string.IsNullOrEmpty(cell) == true)
+                    {
+                        break;
+                    }
+                    // Comment
+                    if (ImportXLS.CheckSignComment(cell) == true)
+                    {
+                        continue;
+                    }
+                    
+$$IMPORT_ROW$$
+                    data.Rows.Add(row);
+                }
+
+                // save scriptable object
+                ScriptableObject obj = AssetDatabase.LoadAssetAtPath(exportPath, typeof(ScriptableObject)) as ScriptableObject;
+                EditorUtility.SetDirty(obj);
+
+                Debug.Log($"[ImportXLS] create '{exportPath}'.");
+            }
+        }
+    }
+
+    static bool import(int r, int c, string cell, bool success)
+    {
+        if (success == false)
+        {
+            Debug.LogError($"[{ImportXLS.GetXLS_RC(r, c)}] '{cell}' import error!");
+            return false;
+        }
+        return true;
+    }
+
+}
