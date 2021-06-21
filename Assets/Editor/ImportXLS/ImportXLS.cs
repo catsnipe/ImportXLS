@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define JAPANESE
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,7 +47,7 @@ public partial class ImportXLS : EditorWindow
     /// <summary>
     /// 最大列数
     /// </summary>
-    const int    COLS_MAX                 = 50;
+    const int    COLS_MAX                 = 200;
 
     const int    MARGINROW_BETWEEN_CTG    = 2;
     const string SIGN_ENUM                = "enum:";
@@ -99,6 +101,8 @@ public partial class ImportXLS : EditorWindow
     const string PREFS_PRESUFFIX_DATA       = ".psdata";
 
     static readonly string CLASS_NAME             = $"{nameof(ImportXLS)}";
+
+#if JAPANESE
     static readonly string MSG_ROWMAXOVER         = "[{0}] 行数が作成可能最大数を超えています[{1}].\r\n- セルに見えない空白文字が含まれている可能性があります.\r\n- どうしても最大を増やしたい場合は、" + CLASS_NAME + ".ROWS_MAX の値を増やします.";
     static readonly string MSG_COLMAXOVER         = "[{0}] 列数が作成可能最大数を超えています[{1}].\r\n- セルに見えない空白文字が含まれている可能性があります.\r\n- どうしても最大を増やしたい場合は、" + CLASS_NAME + ".COLS_MAX の値を増やします.";
     static readonly string MSG_ID_ONLYONE         = "[{0}: {1}] ID は 1 テーブルに 1 つのみです.";
@@ -106,19 +110,41 @@ public partial class ImportXLS : EditorWindow
     static readonly string MSG_ENUMNAME_NOTFOUND  = "[{0}: {1}] ENUM のグループ名がありません.";
     static readonly string MSG_CONSTNAME_ONLYONE  = "[{0}: {1}] 同名の CONST クラスが既に存在します.";
     static readonly string MSG_CONSTNAME_NOTFOUND = "[{0}: {1}] CONST のクラス名がありません.";
-    static readonly string MSG_SAMEMEMBER         = "[{0}: {1}] 既に同じメンバーがあります. '{2}'";
-    static readonly string MSG_TYPE_NOTFOUND      = "[{0}: {1}] タイプがありません. '{2}'";
+    static readonly string MSG_SAMEMEMBER         = "[{0}: {1}] 既に同じフィールドがあります. '{2}'";
+    static readonly string MSG_TYPE_NOTFOUND      = "[{0}: {1}] フィールドの型がありません. '{2}'";
     static readonly string MSG_NEED_BLANKROW      = "[{0}: {1}] 各カテゴリ間は最低 {2} 行マージンを取る必要があります.";
     static readonly string MSG_CLASSTMPL_NOTFOUND = "{0} が見つかりません.";
-    static readonly string MSG_DIRECTORY_INVALID  = "ディレクトリは {0} から始まる相対パスを指定してください.";
-    static readonly string MSG_CREATE_ENVIRONMENT = "Scriptable Object 構築環境を作成しました.\r\nReimport で Scriptable Object が作成可能です.";
-    static readonly string MSG_USE_SAME_CLASS     = "{0} と同一のため、{0} を使います.";
+    static readonly string MSG_DIRECTORY_INVALID  = "ディレクトリは '{0}' から始まる相対パスを指定してください.";
+    static readonly string MSG_CREATE_ENVIRONMENT = "管理クラスを作成しました.\r\nReimport で Scriptable Object が作成可能です.";
+    static readonly string MSG_USE_SAME_CLASS     = "同一クラスが存在するため、最初のクラス定義を使用します. '{0}'";
     static readonly string MSG_SHEETNAME_CANT_JP  = "{0}: 日本語名のシートは無視します.";
     static readonly string MSG_NOT_FOUND_ENUMTBL  = "{0}: enum で存在しないシート名が指定されています.";
     static readonly string MSG_CREATE_ACCESS      = "*シングルトンなアクセスクラス (X_[SHEET_NAME]) を作成します";
-    static readonly string MSG_TOGETHER_CLASS     = "*複数のシートで同じ形のクラスがある場合、最初のシート名のクラスにまとめます";
+    static readonly string MSG_TOGETHER_CLASS     = "*同じフィールドルールのテーブルがある場合、最初のシートにまとめます";
 
-    static readonly string MSG_CANCEL             = "ユーザーキャンセルされました。";
+    static readonly string MSG_CANCEL             = "ユーザーキャンセルされました.";
+#else
+    static readonly string MSG_ROWMAXOVER         = "[{0}] The maximum number of lines that can created has been exceeded[{1}].\r\n- The cell may contain invisible whitespace.\r\n- どうしても最大を増やしたい場合は、" + CLASS_NAME + ".ROWS_MAX の値を増やします.";
+    static readonly string MSG_COLMAXOVER         = "[{0}] The maximum number of columns that can be created has been exceeded[{1}].\r\n- The cell may contain invisible whitespace.";
+    static readonly string MSG_ID_ONLYONE         = "[{0}: {1}] Only one ID per table.";
+    static readonly string MSG_ENUMNAME_ONLYONE   = "[{0}: {1}] 'Enum' with the same name already exists.";
+    static readonly string MSG_ENUMNAME_NOTFOUND  = "[{0}: {1}] There is no definition for 'Enum'.";
+    static readonly string MSG_CONSTNAME_ONLYONE  = "[{0}: {1}] There is a Const Class with the same name.";
+    static readonly string MSG_CONSTNAME_NOTFOUND = "[{0}: {1}] Missing Const Class Name.";
+    static readonly string MSG_SAMEMEMBER         = "[{0}: {1}] The table has the same field. '{2}'";
+    static readonly string MSG_TYPE_NOTFOUND      = "[{0}: {1}] There is no field type. '{2}'";
+    static readonly string MSG_NEED_BLANKROW      = "[{0}: {1}] There must be a minimum of {2} line margins between each category.";
+    static readonly string MSG_CLASSTMPL_NOTFOUND = "{0} not found.";
+    static readonly string MSG_DIRECTORY_INVALID  = "The directory specifies a relative path. It starts with '{0}'.";
+    static readonly string MSG_CREATE_ENVIRONMENT = "I created a management class.\r\nCreate a Scriptable Object with 'Reimport'.";
+    static readonly string MSG_USE_SAME_CLASS     = "Use the first class definition because the same class exists. '{0}'";
+    static readonly string MSG_SHEETNAME_CANT_JP  = "{0}: Ignore Japanese Sheet.";
+    static readonly string MSG_NOT_FOUND_ENUMTBL  = "{0}: A non-existent sheet name is specified in the enum.";
+    static readonly string MSG_CREATE_ACCESS      = "*Create a singleton access class (X_ [SHEET_NAME])";
+    static readonly string MSG_TOGETHER_CLASS     = "*If you have tables with the same field rules, put them together in the first sheet.";
+
+    static readonly string MSG_CANCEL             = "User canceled.";
+#endif
 
     /// <summary>
     /// ポジションインデックス
