@@ -20,7 +20,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [Dependencies]
 This sample project includes the work that is distributed in the Apache License 2.0 / MIT / MIT X11.
-このサンプルプロジェクトは、 Apache 2.0 / MIT / MIT X11 ライセンスで配布されている dll が含まれています。
+このサンプルプロジェクトは、 Apache 2.0 / MIT / MIT X11 ライセンスの dll が含まれています。
 
 NPOI (Apache2.0):
 https://www.nuget.org/packages/NPOI/2.5.1/License
