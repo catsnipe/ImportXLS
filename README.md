@@ -3,11 +3,11 @@ Convert excel sheet to Unity Scriptable object
 
 ![image](https://user-images.githubusercontent.com/85425896/122719958-d3d21a80-d2a9-11eb-83b0-cda205fc1749.png)
 
-# requirement
+## requirement
 unity2017 or later  
 npoi2.5.1 or later  
 
-# usage
+## usage
 1. Download sample project and open `SampleScene.unity`.
 2. Right click on Sample.xlsx and `ImportXLS`.
 3. Click 'CREATE ALL'.  
@@ -38,7 +38,7 @@ npoi2.5.1 or later
 
 see more detail (japanese): https://www.create-forever.games/xls-scriptable3/
 
-# license
+## license
 This sample project includes the work that is distributed in the Apache License 2.0 / MIT / MIT X11.  
 
 NPOI (Apache2.0): https://www.nuget.org/packages/NPOI/2.5.1/License  
