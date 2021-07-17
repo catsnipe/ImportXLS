@@ -173,7 +173,7 @@ public partial class ImportXLS : EditorWindow
                     sb_index_find.AppendLine( "\t/// <summary>");
                     sb_index_find.AppendLine($"\t/// {member.Key}");
                     sb_index_find.AppendLine( "\t/// </summary>");
-                    sb_index_find.AppendLine($"\tpublic Row FindRowBy{member.Key}({type} val)");
+                    sb_index_find.AppendLine($"\tpublic Row FindRowBy{member.Key}({type} val, bool errorLog = true)");
                     sb_index_find.AppendLine( "\t{");
                     sb_index_find.AppendLine($"\t\tif ({name} == null)");
                     sb_index_find.AppendLine( "\t\t{");
@@ -182,7 +182,10 @@ public partial class ImportXLS : EditorWindow
                     sb_index_find.AppendLine( "\t\t}");
                     sb_index_find.AppendLine($"\t\tif ({name}.ContainsKey(val) == false)");
                     sb_index_find.AppendLine( "\t\t{");
-                    sb_index_find.AppendLine( "\t\t\tDebug.LogError(\"cannot find: {val}\");");
+                    sb_index_find.AppendLine( "\t\t\tif (errorLog == true)");
+                    sb_index_find.AppendLine( "\t\t\t{");
+                    sb_index_find.AppendLine( "\t\t\t\tDebug.LogError($\"cannot find: {val}\");");
+                    sb_index_find.AppendLine( "\t\t\t}");
                     sb_index_find.AppendLine( "\t\t\treturn null;");
                     sb_index_find.AppendLine( "\t\t}");
                     sb_index_find.AppendLine($"\t\treturn {name}[val];");
@@ -278,9 +281,9 @@ public partial class ImportXLS : EditorWindow
                     sb_index_find.AppendLine( "\t/// <summary>");
                     sb_index_find.AppendLine($"\t/// {member.Key}");
                     sb_index_find.AppendLine( "\t/// </summary>");
-                    sb_index_find.AppendLine($"\tpublic static {tablename}.Row FindRowBy{member.Key}({row.Type} val)");
+                    sb_index_find.AppendLine($"\tpublic static {tablename}.Row FindRowBy{member.Key}({row.Type} val, bool errorLog = true)");
                     sb_index_find.AppendLine( "\t{");
-                    sb_index_find.AppendLine($"\t\treturn table.FindRowBy{member.Key}(val);");
+                    sb_index_find.AppendLine($"\t\treturn table.FindRowBy{member.Key}(val, errorLog);");
                     sb_index_find.AppendLine( "\t}");
                     sb_index_find.AppendLine( "");
                 }
