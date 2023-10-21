@@ -2,7 +2,9 @@ This is an older converter.
 Newer converters are registered here.
 
 → https://github.com/catsnipe/XlsToJson
-
+   
+   
+   
 # ImportXLS
 Convert excel sheet to Unity Scriptable object
 
